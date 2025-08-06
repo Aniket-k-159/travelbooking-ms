@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Booking UI</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        label, select, input { display: block; margin-bottom: 10px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<h2>Travel Booking System</h2>
+
+<label for="type">Booking Type:</label>
+<select id="type">
+    <option value="train">Train</option>
+    <option value="bus">Bus</option>
+    <option value="hotel">Hotel</option>
+</select>
+
+<label for="user">User Name:</label>
+<input type="text" id="user">
+
+<div id="sourceGroup">
+    <label for="source">Source:</label>
+    <input type="text" id="source">
+</div>
+
+<label for="destination">Destination:</label>
+<input type="text" id="destination">
+
+<label for="date">Date:</label>
+<input type="date" id="date">
+
+<label for="passengers">Passengers:</label>
+<input type="number" id="passengers" min="1" value="1">
+
+<button onclick="book()">Book Ticket</button>
+
+<h3>Response:</h3>
+<pre id="response"></pre>
+
+<script>
+    const typeSelect = document.getElementById("type");
+    const sourceGroup = document.getElementById("sourceGroup");
+
+    // Hide source input for hotel bookings
+    typeSelect.addEventListener("change", function () {
+      if (typeSelect.value === "hotel") {
+        sourceGroup.classList.add("hidden");
+      } else {
+        sourceGroup.classList.remove("hidden");
+      }
+    });
+
+    function book() {
+      const type = document.getElementById("type").value;
+      const user = document.getElementById("user").value;
+      const source = document.getElementById("source").value;
+      const destination = document.getElementById("destination").value;
+      const date = document.getElementById("date").value;
+      const passengers = parseInt(document.getElementById("passengers").value);
+
+      const payload = {
+        type,
+        user,
+        destination,
+        date,
+        passengers
+      };
+
+      if (type !== "hotel") {
+        payload.source = source;
+      }
+
+      fetch("http://localhost:8080/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.text())
+      .then(text => {
+        document.getElementById("response").innerText = text;
+      })
+      .catch(err => {
+        document.getElementById("response").innerText = "Error: " + err;
+      });
+    }
+</script>
+</body>
+</html>
